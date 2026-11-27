@@ -196,5 +196,5 @@ This tool records inspection results only. It does not replace statutory testing
 
 ## Contact
 
-Maintained by: CHIN PIANG SEN
+Maintained by: 曾炳胜
 Purpose: internal site inspection record keeping
