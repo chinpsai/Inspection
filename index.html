@@ -1,64 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>EI(R1) Report</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f2f4f7;color:#222}
+  .container{max-width:760px;margin:0 auto;padding:12px}
+  h1{font-size:18px;margin:8px 0 12px}
+  .btn-group{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;position:sticky;top:0;background:#f2f4f7;padding:6px 0;z-index:5}
+  .btn-group button{flex:1;min-width:140px;padding:10px;border:0;border-radius:8px;font-size:14px;color:#fff;cursor:pointer}
+  .btn-save{background:#2563eb}.btn-clear{background:#dc2626}.btn-pdf{background:#059669}
+  .section-title{background:#1f2937;color:#fff;padding:8px 10px;margin:16px 0 8px;font-weight:bold;border-radius:6px;font-size:14px}
+  .form-row{margin-bottom:8px}
+  .form-row label{display:block;font-size:12px;color:#555;margin-bottom:3px}
+  input:not([type=file]),select,textarea{width:100%;padding:8px;border:1px solid #bbb;border-radius:6px;font-size:14px;background:#fff}
+  textarea{min-height:60px;resize:vertical}
+  .item-card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:10px;margin-bottom:10px}
+  .item-head{font-weight:bold;font-size:14px;margin-bottom:6px}
+  .photo-preview img{max-width:100%;max-height:200px;margin-top:6px;border-radius:6px}
+  #pdfRenderTarget{position:absolute;left:-10000px;top:0;width:720px;background:#fff;color:#000;padding:16px;font-size:12px}
+  #pdfRenderTarget table{border-collapse:collapse;width:100%}
+  #pdfRenderTarget th,#pdfRenderTarget td{border:1px solid #000;padding:4px;vertical-align:top;text-align:left}
+  #pdfRenderTarget tr,#pdfRenderTarget img{page-break-inside:avoid}
+  #pdfRenderTarget h4{page-break-after:avoid}
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>EI(R1) REPORT — LEW Inspection for Condominiums & Multi‑Tenanted Buildings</h1>
+  <h1>EI(R1) REPORT — LEW Inspection for Condominiums &amp; Multi-Tenanted Buildings</h1>
   <div class="btn-group no-print">
-    <button class="btn-save" onclick="saveDraft()">💾 Save draft to local device</button>
-    <button class="btn-clear" onclick="clearDraft()">🗑️Clear draft</button>
-    <button class="btn-pdf" onclick="exportPdf()">📄 Generate EI(R1) PDF report</button>
+    <button class="btn-save" onclick="saveDraft()">💾 Save draft</button>
+    <button class="btn-clear" onclick="clearDraft()">🗑️ Clear draft</button>
+    <button class="btn-pdf" onclick="exportPdf()">📄 Generate PDF</button>
   </div>
 
   <div id="reportEditor">
     <div class="section-title">PARTICULARS OF INSTALLATION</div>
-    <div class="form-row">
-      <label>Name of Installation</label>
-      <input data-key="siteName"/>
-    </div>
-    <div class="form-row">
-      <label>Address of Installation</label>
-      <input data-key="siteAddr"/>
-    </div>
-    <div class="form-row">
-      <label>Installation License No</label>
-      <input data-key="licNo"/>
-    </div>
-    <div class="form-row">
-      <label>Date of Inspection (DD/MM/YYYY)</label>
-      <input data-key="inspectDate" placeholder="28/10/2026"/>
-    </div>
-    <div class="form-row">
-      <label>LEW Name</label>
-      <input data-key="lewName"/>
-    </div>
-    <div class="form-row">
-      <label>LEW License No</label>
-      <input data-key="lewLic"/>
-    </div>
+    <div class="form-row"><label>Name of Installation</label><input data-key="siteName"/></div>
+    <div class="form-row"><label>Address of Installation</label><input data-key="siteAddr"/></div>
+    <div class="form-row"><label>Installation License No</label><input data-key="licNo"/></div>
+    <div class="form-row"><label>Date of Inspection (DD/MM/YYYY)</label><input data-key="inspectDate" placeholder="28/10/2026"/></div>
+    <div class="form-row"><label>LEW Name</label><input data-key="lewName"/></div>
+    <div class="form-row"><label>LEW License No</label><input data-key="lewLic"/></div>
 
-    <!-- 检查清单，完全复刻原报告所有检查条目 -->
     <div id="checklistWrap"></div>
 
-    <div class="section-title">DECLARATION & WITNESS (Signature blank in PDF)</div>
+    <div class="section-title">DECLARATION &amp; WITNESS (signature blank in PDF)</div>
     <div class="form-row">
-      <textarea readonly style="background:#f8f8f8;">I have carried out inspection on [inspectDate], witnessed by the representative of the license and hereby I declare that the electrical installation is fit and safe for operation.
+      <textarea readonly style="background:#f8f8f8;min-height:140px;">I have carried out inspection on the date above, witnessed by the representative of the license and hereby I declare that the electrical installation is fit and safe for operation.
 
-Name of LEW: _______________ License No: _______________ Signature: ________________________
+Name of LEW / License No / Signature: filled in the PDF.
 
 THE INSPECTION WAS WITNESSED BY REPRESENTATIVE OF THE LICENSE
-Name of Representative: ________________________
-Designation: ________________________
-Signature: ________________________
-</textarea>
+Name of Representative, Designation, Signature: left blank in the PDF for hand signing.</textarea>
     </div>
   </div>
 
-  <!-- PDF渲染目标区域 -->
-  <div id="pdfRenderTarget" style="display:none;padding:16px;"></div>
+  <div id="pdfRenderTarget"></div>
 </div>
 
 <script>
-// 完整EI‑R1检查清单，和你PDF一一对应
 const checkListData = [
   {sec:"1 SITE CONDITIONS", items:[
     {ref:"1.1",desc:"Soil Subsidence"},
@@ -75,7 +80,7 @@ const checkListData = [
   ]},
   {sec:"3 SWITCHROOM REQUIREMENTS", items:[
     {ref:"3.1",desc:"Rubber mat"},
-    {ref:"3.2.1",desc:"Single‑line diagram"},
+    {ref:"3.2.1",desc:"Single-line diagram"},
     {ref:"3.2.2",desc:"LEW's contact numbers"},
     {ref:"3.3",desc:"Instruction for treatment of electric shock"},
     {ref:"3.4",desc:"Installation license"},
@@ -96,7 +101,7 @@ const checkListData = [
     {ref:"4.6.2",desc:"Neutral links"},
     {ref:"4.6.3",desc:"Busbar and circuit breakers sizes"},
     {ref:"4.6.4",desc:"Relay settings"},
-    {ref:"4.6.5",desc:"Under‑voltage tripping device"},
+    {ref:"4.6.5",desc:"Under-voltage tripping device"},
     {ref:"4.6.6",desc:"DC supply and battery source (for HT Installation)"},
     {ref:"4.6.7",desc:"Supports for wiring & cables"},
     {ref:"4.6.8",desc:"Labelling of circuits"},
@@ -109,7 +114,7 @@ const checkListData = [
     {ref:"5.2",desc:"Load balancing"},
     {ref:"5.3",desc:"Overloading"},
     {ref:"5.4",desc:"Relay settings"},
-    {ref:"5.5",desc:"Circuit connections at sub‑distribution boards"},
+    {ref:"5.5",desc:"Circuit connections at sub-distribution boards"},
     {ref:"5.6.1",desc:"Suitability of MCBs & RCDs"},
     {ref:"5.6.2",desc:"Tripping currents of RCDs"}
   ]},
@@ -122,201 +127,213 @@ const checkListData = [
   ]}
 ];
 
-// 渲染检查项UI
+const DRAFT_KEY = "eiR1Draft";
+const keyOf = ref => "chk_" + ref.replace(/\./g, "_");   // FIX: replace ALL dots (3.2.1 etc.)
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
 function renderChecklist(){
   const wrap = document.getElementById("checklistWrap");
   wrap.innerHTML = "";
   checkListData.forEach(secObj=>{
     const secDiv = document.createElement("div");
     secDiv.className = "section-title";
-    secDiv.innerText = secObj.sec;
+    secDiv.textContent = secObj.sec;
     wrap.appendChild(secDiv);
     secObj.items.forEach(it=>{
+      const k = keyOf(it.ref);
       const card = document.createElement("div");
       card.className = "item-card";
-      const itemKey = `chk_${it.ref.replace(".","_")}`;
       card.innerHTML = `
-        <div class="item-head">${it.ref} — ${it.desc}</div>
+        <div class="item-head">${it.ref} — ${esc(it.desc)}</div>
         <div class="form-row">
           <label>Status</label>
-          <select data-key="${itemKey}_status">
+          <select data-key="${k}_status">
+            <option value="">— select —</option>
             <option value="✓">✓ Acceptable</option>
             <option value="✗">✗ Unacceptable</option>
-            <option value="NA">NA Not‑Applicable</option>
+            <option value="NA">NA Not-Applicable</option>
           </select>
         </div>
         <div class="form-row">
           <label>Remarks</label>
-          <textarea data-key="${itemKey}_rm" placeholder="Type remarks / rectification action here…"></textarea>
+          <textarea data-key="${k}_rm" placeholder="Type remarks / rectification action here…"></textarea>
         </div>
         <div class="photo-area">
-          <label>Attach Photo (for this inspection item)</label>
-          <input type="file" accept="image/*" capture="camera" data-photokey="${itemKey}_pic"/>
-          <div class="photo-preview" id="prev_${itemKey}"></div>
-        </div>
-      `;
+          <label>Attach Photo (camera or gallery)</label>
+          <input type="file" accept="image/*" data-photokey="${k}_pic"/>
+          <div class="photo-preview" id="prev_${k}_pic"></div>
+        </div>`;
       wrap.appendChild(card);
-    })
-  })
-  bindPhotoInputs();
+    });
+  });
+  bindInputs();
 }
 
-// 手机拍照预览
-function bindPhotoInputs(){
+// FIX: compress photos, otherwise phone photos (3-8MB each) blow the 5MB localStorage limit
+function compressImage(file, maxSide=1000, quality=0.7){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = ev=>{
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = ()=>{
+        const scale = Math.min(1, maxSide/Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width*scale);
+        c.height = Math.round(img.height*scale);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        resolve(c.toDataURL("image/jpeg", quality));
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function showPhoto(pk, dataUrl){
+  const prev = document.getElementById("prev_"+pk);
+  if(!prev) return;
+  prev.innerHTML = "";
+  if(!dataUrl) return;
+  const img = new Image();
+  img.src = dataUrl;
+  prev.appendChild(img);
+}
+
+function bindInputs(){
   document.querySelectorAll('input[data-photokey]').forEach(input=>{
-    input.onchange = function(e){
-      const pk = this.dataset.photokey;
-      const prevEl = document.getElementById("prev_"+pk);
-      prevEl.innerHTML = "";
-      if(!e.target.files[0]) return;
-      const reader = new FileReader();
-      reader.onload=ev=>{
-        const img = new Image();
-        img.src = ev.target.result;
-        prevEl.appendChild(img);
-      }
-      reader.readAsDataURL(e.target.files[0]);
-    }
-  })
+    input.onchange = async function(){
+      const f = this.files[0];
+      if(!f) return;
+      try{
+        showPhoto(this.dataset.photokey, await compressImage(f));
+        autoSave();
+      }catch(e){ alert("Photo could not be read, please try again."); }
+    };
+  });
+  // quiet auto-save whenever any field changes
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    el.addEventListener("change", autoSave);
+  });
 }
 
-// 草稿保存到localStorage（手机浏览器本地）
-function saveDraft(){
-  const draft = {};
-  document.querySelectorAll('[data-key]').forEach(el=>{
-    draft[el.dataset.key] = el.value;
-  })
-  // 图片base64也存入草稿
+// FIX: one function that reads the LIVE form (PDF no longer depends on a saved draft)
+function collectState(){
+  const d = {};
+  document.querySelectorAll('[data-key]').forEach(el=>{ d[el.dataset.key] = el.value; });
   document.querySelectorAll('input[data-photokey]').forEach(inp=>{
-    const pk = inp.dataset.photokey;
-    const prevDiv = document.getElementById("prev_"+pk);
-    if(prevDiv.firstChild && prevDiv.firstChild.src){
-      draft[pk] = prevDiv.firstChild.src;
-    }
-  })
-  localStorage.setItem("eiR1Draft", JSON.stringify(draft));
-  alert("✅草稿已保存本机，关闭页面下次打开可以恢复");
+    const img = document.querySelector("#prev_"+inp.dataset.photokey+" img");
+    if(img && img.src) d[inp.dataset.photokey] = img.src;
+  });
+  return d;
 }
 
-// 加载草稿
+function persist(){
+  try{
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(collectState()));
+    return true;
+  }catch(e){ return false; }   // FIX: storage full / private mode no longer crashes
+}
+let autoTimer;
+function autoSave(){ clearTimeout(autoTimer); autoTimer = setTimeout(persist, 600); }
+
+function saveDraft(){
+  alert(persist()
+    ? "✅ Draft saved on this device."
+    : "⚠️ Could not save (storage full?). Generate the PDF now, or remove some photos.");
+}
+
 function loadDraft(){
-  const raw = localStorage.getItem("eiR1Draft");
-  if(!raw) return;
-  const draft = JSON.parse(raw);
+  let d;
+  try{ d = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); }catch(e){ d = null; }
+  if(!d) return;
   document.querySelectorAll('[data-key]').forEach(el=>{
-    if(draft[el.dataset.key]!==undefined) el.value = draft[el.dataset.key];
-  })
-  //恢复图片预览
-  Object.keys(draft).forEach(k=>{
-    if(k.endsWith("_pic") && draft[k]){
-      const prevDiv = document.getElementById("prev_"+k);
-      if(!prevDiv) return;
-      prevDiv.innerHTML="";
-      const img=new Image(); img.src=draft[k];
-      prevDiv.appendChild(img);
-    }
-  })
+    if(d[el.dataset.key] !== undefined) el.value = d[el.dataset.key];
+  });
+  Object.keys(d).forEach(k=>{ if(k.endsWith("_pic")) showPhoto(k, d[k]); });
 }
 
 function clearDraft(){
-  if(!confirm("确认清空全部草稿？不可恢复！")) return;
-  localStorage.removeItem("eiR1Draft");
+  if(!confirm("Clear ALL data and photos? This cannot be undone.")) return;
+  localStorage.removeItem(DRAFT_KEY);
   location.reload();
 }
 
-// 导出PDF，复刻原版EI(R1)格式
-function exportPdf(){
-  alert("开始生成PDF，手机请稍候…");
-  const target = document.getElementById("pdfRenderTarget");
-  target.style.display="block";
-  target.innerHTML = buildPdfHtml();
-  const opt = {
-    margin:12,filename:"EI_R1_INSPECTION_REPORT.pdf",
-    image:{type:"jpeg",quality:0.8},
-    html2canvas:{scale:2},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}
-  };
-  html2pdf().set(opt).from(target).save().then(()=>{
-    target.style.display="none";
-  })
-}
-
-// 构造PDF完整HTML（原版EMA报告版式）
-function buildPdfHtml(){
-  const draftStr = localStorage.getItem("eiR1Draft");
-  const d = draftStr ? JSON.parse(draftStr) : {};
-  const siteName = d["siteName"]||"";
-  const siteAddr = d["siteAddr"]||"";
-  const licNo = d["licNo"]||"";
-  const inspDate = d["inspectDate"]||"";
-  const lewName = d["lewName"]||"";
-  const lewLic = d["lewLic"]||"";
-
+function buildPdfHtml(d){
+  const g = k => esc(d[k] || "");
   let html = `
   <h2>EI(R1) REPORT</h2>
-  <h3>REPORT BY LICENSED ELECTRICAL WORKER (LEW) FOR CONDOMINIUMS AND MULTI‑TENANTED BUILDINGS</h3>
-  <p style="font-size:12px;">This form has 7 sections and shall be filled up during site inspection in the presence of the consumer's representative. It may take at least 40 minutes to fill up the form, depending on the scale of the consumer's electrical installation. You will require your license number and the particulars of the electrical installation license to complete this report.</p>
-  <p style="font-size:12px;"><b>Note:</b> The original copy of this report shall be submitted to the Energy Market Authority of Singapore. All boxes must be filled. Tick ( ✓), (✗) or (NA). Remarks column for rectification actions.</p>
-
+  <h3>REPORT BY LICENSED ELECTRICAL WORKER (LEW) FOR CONDOMINIUMS AND MULTI-TENANTED BUILDINGS</h3>
+  <p><b>Note:</b> The original copy of this report shall be submitted to the Energy Market Authority of Singapore. All boxes must be filled. Tick (✓), (✗) or (NA). Remarks column for rectification actions.</p>
   <h4>PARTICULARS OF INSTALLATION</h4>
-  <table border="1" cellpadding="6" cellspacing="0" width="100%">
-    <tr><td>Name of Installation</td><td>${siteName}</td></tr>
-    <tr><td>Address of Installation</td><td>${siteAddr}</td></tr>
-    <tr><td>Installation License No</td><td>${licNo}</td></tr>
-    <tr><td>Date of Inspection</td><td>${inspDate}</td></tr>
-  </table>
-  <br/>
-  `;
+  <table>
+    <tr><td width="35%">Name of Installation</td><td>${g("siteName")}</td></tr>
+    <tr><td>Address of Installation</td><td>${g("siteAddr")}</td></tr>
+    <tr><td>Installation License No</td><td>${g("licNo")}</td></tr>
+    <tr><td>Date of Inspection</td><td>${g("inspectDate")}</td></tr>
+  </table><br/>`;
 
-  //主检查表
   checkListData.forEach(secObj=>{
-    html += `<h4>${secObj.sec}</h4>`;
-    html += `<table border="1" cellpadding="5" cellspacing="0" width="100%">
-    <thead><tr><th>Ref</th><th>Item Description</th><th>Status</th><th>Remarks</th></tr></thead><tbody>`;
+    html += `<h4>${esc(secObj.sec)}</h4>
+    <table><thead><tr><th width="9%">Ref</th><th width="33%">Item Description</th><th width="10%">Status</th><th>Remarks</th></tr></thead><tbody>`;
     secObj.items.forEach(it=>{
-      const kPre = `chk_${it.ref.replace(".","_")}`;
-      const stat = d[`${kPre}_status`]||"";
-      const rm = d[`${kPre}_rm`]||"";
-      html += `<tr>
-        <td>${it.ref}</td>
-        <td>${it.desc}</td>
-        <td>${stat}</td>
-        <td style="max-width:320px;white-space:pre‑wrap;">${rm}</td>
-      </tr>`;
-    })
+      const k = keyOf(it.ref);
+      html += `<tr><td>${it.ref}</td><td>${esc(it.desc)}</td><td>${g(k+"_status")}</td>
+        <td style="white-space:pre-wrap;">${g(k+"_rm")}</td></tr>`;
+    });
     html += `</tbody></table><br/>`;
-  })
+  });
 
-  //附录：照片，每条检查项附带图片+remarks
-  html += `<h3>APPENDIX – SITE PHOTOS & REMARKS</h3>`;
-  checkListData.forEach(secObj=>{
-    secObj.items.forEach(it=>{
-      const kPre = `chk_${it.ref.replace(".","_")}`;
-      const picData = d[`${kPre}_pic`];
-      const rm = d[`${kPre}_rm`]||"";
-      if(picData){
-        html += `<div><h4>${it.ref} — ${it.desc}</h4>`;
-        html += `<img src="${picData}" style="max-width:100%;max-height:240px;"/>`;
-        html += `<p><b>Remark:</b> ${rm}</p><hr/></div>`;
-      }
-    })
-  })
+  let photos = "";
+  checkListData.forEach(secObj=>secObj.items.forEach(it=>{
+    const k = keyOf(it.ref);
+    if(d[k+"_pic"]){
+      photos += `<div style="page-break-inside:avoid;"><h4>${it.ref} — ${esc(it.desc)}</h4>
+        <img src="${d[k+"_pic"]}" style="max-width:100%;max-height:240px;"/>
+        <p><b>Remark:</b> ${g(k+"_rm")}</p><hr/></div>`;
+    }
+  }));
+  if(photos) html += `<h3 style="page-break-before:always;">APPENDIX – SITE PHOTOS &amp; REMARKS</h3>` + photos;
 
-  //LEW声明签字栏
   html += `
+  <div style="page-break-inside:avoid;">
   <h4>DECLARATION BY LEW</h4>
-  <p>I have carried out inspection on ${inspDate} (date of inspection), witnessed by the representative of the license and hereby I declare that the electrical installation is fit and safe for operation.</p>
-  <p>Name of LEW: ${lewName} &nbsp;&nbsp; License No: ${lewLic}<br/>Signature: ________________________</p>
+  <p>I have carried out inspection on ${g("inspectDate")} (date of inspection), witnessed by the representative of the license and hereby I declare that the electrical installation is fit and safe for operation.</p>
+  <p>Name of LEW: ${g("lewName")} &nbsp;&nbsp; License No: ${g("lewLic")}<br/><br/>Signature: ________________________</p>
   <h4>THE INSPECTION WAS WITNESSED BY REPRESENTATIVE OF THE LICENSE</h4>
-  <p>Name of Representative: ________________________<br/>Designation: ________________________<br/>Signature: ________________________</p>
-  `;
+  <p>Name of Representative: ________________________<br/><br/>Designation: ________________________<br/><br/>Signature: ________________________</p>
+  </div>`;
   return html;
 }
 
-//页面打开自动恢复上次草稿
-window.onload = function(){
-  renderChecklist();
-  loadDraft();
+function exportPdf(){
+  if(typeof html2pdf === "undefined"){
+    alert("PDF library did not load. Check your internet connection and reload the page.");
+    return;
+  }
+  const d = collectState();               // FIX: use live form, not localStorage
+  persist();
+  const missing = [];
+  checkListData.forEach(s=>s.items.forEach(it=>{ if(!d[keyOf(it.ref)+"_status"]) missing.push(it.ref); }));
+  if(missing.length && !confirm(`${missing.length} item(s) have no status yet (${missing.slice(0,8).join(", ")}${missing.length>8?"…":""}). Generate PDF anyway?`)) return;
+
+  const target = document.getElementById("pdfRenderTarget");
+  target.innerHTML = buildPdfHtml(d);     // FIX: target is off-screen, not display:none (which gave blank PDFs)
+  const opt = {
+    margin:12,
+    filename:"EI_R1_INSPECTION_REPORT.pdf",
+    image:{type:"jpeg",quality:0.8},
+    html2canvas:{scale:2,useCORS:true,scrollY:0},
+    jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},
+    pagebreak:{mode:["css","legacy"]}
+  };
+  html2pdf().set(opt).from(target).save()
+    .catch(e=>alert("PDF generation failed: "+e))
+    .finally(()=>{ target.innerHTML = ""; });
 }
+
+window.addEventListener("load", ()=>{ renderChecklist(); loadDraft(); });
 </script>
 </body>
 </html>
