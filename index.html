@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +21,10 @@
   .item-card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:10px;margin-bottom:10px}
   .item-head{font-weight:bold;font-size:14px;margin-bottom:6px}
   .photo-preview img{max-width:100%;max-height:200px;margin-top:6px;border-radius:6px}
-  #pdfRenderTarget{position:absolute;left:-10000px;top:0;width:720px;background:#fff;color:#000;padding:16px;font-size:12px}
+  #pdfRenderTarget{display:none;width:720px;background:#fff;color:#000;padding:16px;font-size:12px}
+  #pdfRenderTarget.exporting{display:block;position:absolute;left:0;top:0;z-index:99999}
+  #exportMask{display:none;position:fixed;inset:0;background:#fff;z-index:99998;text-align:center;padding-top:40vh;font-size:18px}
+  #exportMask.on{display:block}
   #pdfRenderTarget table{border-collapse:collapse;width:100%}
   #pdfRenderTarget th,#pdfRenderTarget td{border:1px solid #000;padding:4px;vertical-align:top;text-align:left}
   #pdfRenderTarget tr,#pdfRenderTarget img{page-break-inside:avoid}
@@ -60,6 +62,7 @@ Name of Representative, Designation, Signature: left blank in the PDF for hand s
     </div>
   </div>
 
+  <div id="exportMask">正在生成PDF，请稍候… Generating PDF…</div>
   <div id="pdfRenderTarget"></div>
 </div>
 
@@ -319,21 +322,39 @@ function exportPdf(){
   if(missing.length && !confirm(`${missing.length} item(s) have no status yet (${missing.slice(0,8).join(", ")}${missing.length>8?"…":""}). Generate PDF anyway?`)) return;
 
   const target = document.getElementById("pdfRenderTarget");
-  target.innerHTML = buildPdfHtml(d);     // FIX: target is off-screen, not display:none (which gave blank PDFs)
+  const mask = document.getElementById("exportMask");
+  target.innerHTML = buildPdfHtml(d);
+  mask.classList.add("on");
+  target.classList.add("exporting");
+  window.scrollTo(0,0);
   const opt = {
     margin:12,
     filename:"EI_R1_INSPECTION_REPORT.pdf",
     image:{type:"jpeg",quality:0.8},
-    html2canvas:{scale:2,useCORS:true,scrollY:0},
+    html2canvas:{scale:1.5,useCORS:true,scrollX:0,scrollY:0,backgroundColor:"#ffffff"},
     jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},
     pagebreak:{mode:["css","legacy"]}
   };
-  html2pdf().set(opt).from(target).save()
+  const imgs = Array.from(target.querySelectorAll("img"));
+  Promise.all(imgs.map(im=> im.complete ? Promise.resolve() : new Promise(r=>{im.onload=im.onerror=r;})))
+    .then(()=> new Promise(r=>setTimeout(r,300)))
+    .then(()=> html2pdf().set(opt).from(target).save())
     .catch(e=>alert("PDF generation failed: "+e))
-    .finally(()=>{ target.innerHTML = ""; });
+    .finally(()=>{
+      target.classList.remove("exporting");
+      mask.classList.remove("on");
+      target.innerHTML = "";
+    });
 }
 
 window.addEventListener("load", ()=>{ renderChecklist(); loadDraft(); });
 </script>
 </body>
 </html>
+
+ 
+    
+
+
+  
+ 
