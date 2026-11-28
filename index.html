@@ -1,1 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>EI(R1) Report</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{--bg:#f3f5f9;--card:#fff;--ink:#1b2330;--mute:#6a7586;--line:#dce1ea;--blue:#2459d6;--green:#14935a;--red:#d63a3a;--gray:#8a94a3}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:90px}
+  .wrap{max-width:760px;margin:0 auto;padding:12px}
+  header{display:flex;justify-content:space-between;align-items:flex-end;margin:6px 0 12px}
+  h1{font-size:19px;margin:0}
+  header small{color:var(--mute)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .card h2{font-size:14px;margin:0 0 8px;color:var(--blue);letter-spacing:.3px}
+  label{display:block;font-size:12px;color:var(--mute);margin:8px 0 3px}
+  input[type=text],textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;font-size:15px;background:#fff;color:var(--ink);font-family:inherit}
+  textarea{resize:vertical}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  #sig{width:100%;height:120px;border:1.5px dashed var(--gray);border-radius:8px;background:#fff;touch-action:none;display:block}
+  .row{display:flex;gap:8px;align-items:center;margin-top:6px}
+  .row small{color:var(--mute);flex:1}
+  button{font-family:inherit;cursor:pointer}
+  .link{background:none;border:0;color:var(--blue);font-size:13px;padding:4px}
+  details.sec{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+  details.sec>summary{list-style:none;padding:12px;font-weight:700;font-size:14px;background:#e9eefb;cursor:pointer;display:flex;gap:8px;align-items:center}
+  details.sec>summary::-webkit-details-marker{display:none}
+  .sn{background:var(--blue);color:#fff;border-radius:6px;padding:1px 8px;font-size:13px}
+  .cnt{margin-left:auto;font-weight:400;color:var(--mute);font-size:12px}
+  .secbtn{padding:6px 12px 0;text-align:right}
+  .items{padding:6px 10px 10px}
+  .item{border:1px solid var(--line);border-left:5px solid #cfd5df;border-radius:10px;padding:8px 10px;margin-top:8px;background:#fff}
+  .item.done{border-left-color:var(--green)}
+  .item.bad{border-left-color:var(--red);background:#fff6f6}
+  .ih{font-size:14px;margin-bottom:6px}
+  .ih b{color:var(--blue)}
+  .st{display:flex;gap:6px}
+  .sb{flex:1;padding:9px 0;border:1.5px solid var(--line);border-radius:8px;background:#fff;font-size:16px;font-weight:700;color:var(--mute)}
+  .sb.ok.on{background:var(--green);border-color:var(--green);color:#fff}
+  .sb.no.on{background:var(--red);border-color:var(--red);color:#fff}
+  .sb.na.on{background:var(--gray);border-color:var(--gray);color:#fff}
+  .ab{width:46px;padding:9px 0;border:1.5px solid var(--line);border-radius:8px;background:#fff;font-size:16px}
+  .ent{display:flex;gap:8px;margin-top:8px;align-items:flex-start}
+  .ent img{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+  .er{flex:1;display:flex;gap:6px}
+  .er textarea{min-height:62px}
+  .x{border:0;background:#f1d6d6;color:var(--red);border-radius:8px;width:34px;font-size:15px}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px;display:flex;gap:8px;justify-content:center;z-index:10}
+  .bar button{flex:1;max-width:240px;padding:12px 6px;border:0;border-radius:10px;font-size:14px;font-weight:700;color:#fff}
+  #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;align-items:center;justify-content:center;padding:20px}
+  #modal.on{display:flex}
+  #modal .box{background:#fff;border-radius:12px;padding:16px;max-width:420px;width:100%}
+  #mmsg{white-space:pre-wrap;font-size:14px;margin-bottom:14px}
+  #modal .mb{display:flex;gap:8px;justify-content:flex-end}
+  #modal button{padding:9px 16px;border:0;border-radius:8px;font-size:14px;font-weight:700}
+  #myes{background:var(--blue);color:#fff}#mno{background:#e3e7ee;color:var(--ink)}
+  .b1{background:var(--blue)}.b2{background:var(--green)}.b3{background:#9aa3b2}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>EI(R1) Report</h1>
+    <small><span id="prog">0/0</span> done · <span id="saved">—</span></small>
+  </header>
+
+  <div class="card">
+    <h2>PARTICULARS OF INSTALLATION</h2>
+    <label>Name of Installation</label><input type="text" data-site="name"/>
+    <label>Address of Installation</label><textarea rows="2" data-site="addr"></textarea>
+    <div class="grid2">
+      <div><label>Installation License No</label><input type="text" data-site="lic"/></div>
+      <div><label>Date of Inspection (DD/MM/YYYY)</label><input type="text" data-site="date" inputmode="numeric"/></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>LEW (saved on this device for every report)</h2>
+    <div class="grid2">
+      <div><label>Name of LEW</label><input type="text" data-prof="name"/></div>
+      <div><label>License No</label><input type="text" data-prof="lic"/></div>
+    </div>
+    <label>Signature (draw with finger / mouse)</label>
+    <canvas id="sig" width="600" height="180"></canvas>
+    <div class="row"><small>Drawn once, reused in all PDFs.</small><button type="button" class="link" id="sigClear">Clear signature</button></div>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<div id="modal"><div class="box"><div id="mmsg"></div><div class="mb"><button id="mno" type="button">Cancel</button><button id="myes" type="button">OK</button></div></div></div>
+<input id="pick" type="file" accept="image/*" multiple hidden/>
+
+<div class="bar">
+  <button class="b1" id="btnAllOk" type="button">All unset → ✓</button>
+  <button class="b2" id="btnPdf" type="button">📄 Generate PDF</button>
+  <button class="b3" id="btnNew" type="button">New report</button>
+</div>
+
+<script>
+const DATA = [
+  {sec:"1 SITE CONDITIONS", items:[
+    {ref:"1.1",desc:"Soil Subsidence"},{ref:"1.2",desc:"Drainage"},{ref:"1.3",desc:"Access"}]},
+  {sec:"2 ENVIRONMENT CONDITIONS", items:[
+    {ref:"2.1",desc:"Switchroom locking facilities"},{ref:"2.2",desc:"Switchroom roof"},
+    {ref:"2.3",desc:"Switchroom basement"},{ref:"2.4",desc:"Lighting"},
+    {ref:"2.5",desc:"Ventilation"},{ref:"2.6",desc:"Not use as storage"}]},
+  {sec:"3 SWITCHROOM REQUIREMENTS", items:[
+    {ref:"3.1",desc:"Rubber mat"},{ref:"3.2.1",desc:"Single-line diagram"},
+    {ref:"3.2.2",desc:"LEW's contact numbers"},{ref:"3.3",desc:"Instruction for treatment of electric shock"},
+    {ref:"3.4",desc:"Installation license"},{ref:"3.5",desc:"Log Book (for HT Installation)"},
+    {ref:"3.6",desc:"Danger signs and operating voltage of switchboard displayed"},{ref:"3.7",desc:"Fire extinguisher"}]},
+  {sec:"4 SWITCHBOARD REQUIREMENTS", items:[
+    {ref:"4.1.1",desc:"Earth bar"},{ref:"4.1.2",desc:"Earth value"},{ref:"4.1.3",desc:"Test date"},
+    {ref:"4.2.1",desc:"Earth electrode inspection chamber"},{ref:"4.2.2",desc:"Warning notice"},
+    {ref:"4.3",desc:"Equipotential bonding"},{ref:"4.4",desc:"Earthing of metallic trunkings and conduits"},
+    {ref:"4.5",desc:"Protection against direct contact"},
+    {ref:"4.6.1",desc:"Incoming & outgoing indicator lights, voltmeter & ammeter"},
+    {ref:"4.6.2",desc:"Neutral links"},{ref:"4.6.3",desc:"Busbar and circuit breakers sizes"},
+    {ref:"4.6.4",desc:"Relay settings"},{ref:"4.6.5",desc:"Under-voltage tripping device"},
+    {ref:"4.6.6",desc:"DC supply and battery source (for HT Installation)"},
+    {ref:"4.6.7",desc:"Supports for wiring & cables"},{ref:"4.6.8",desc:"Labelling of circuits"},
+    {ref:"4.7.1",desc:"Temperature rise"},{ref:"4.7.2",desc:"Ionisation & corona discharge (for HT Installation)"},
+    {ref:"4.7.3",desc:"Corrosion"}]},
+  {sec:"5 OPERATIONAL REQUIREMENTS", items:[
+    {ref:"5.1",desc:"Incoming load"},{ref:"5.2",desc:"Load balancing"},{ref:"5.3",desc:"Overloading"},
+    {ref:"5.4",desc:"Relay settings"},{ref:"5.5",desc:"Circuit connections at sub-distribution boards"},
+    {ref:"5.6.1",desc:"Suitability of MCBs & RCDs"},{ref:"5.6.2",desc:"Tripping currents of RCDs"}]},
+  {sec:"6 OTHER FEATURES", items:[
+    {ref:"6.1",desc:"Outdoor fittings"},{ref:"6.2",desc:"30mA RCCBs in high risk areas"},
+    {ref:"6.3",desc:"Standby Genset / ATS"},{ref:"6.4",desc:"Additional photo & remarks"},
+    {ref:"6.5",desc:"Approved Load"}]}
+];
+const ALL = DATA.flatMap(s=>s.items.map(i=>i.ref));
+const REF = {}; DATA.forEach(s=>s.items.forEach(i=>REF[i.ref]=i));
+const $ = s=>document.querySelector(s);
+function ask(msg,okOnly){return new Promise(res=>{const m=$("#modal");$("#mmsg").textContent=msg;$("#mno").style.display=okOnly?"none":"";m.classList.add("on");const done=v=>{m.classList.remove("on");res(v);};$("#myes").onclick=()=>done(true);$("#mno").onclick=()=>done(false);});}
+const say=msg=>ask(msg,true);
+const esc = s=>String(s??"").replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+function today(){const d=new Date();return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();}
+function freshState(){return {site:{name:"",addr:"",lic:"",date:today()},items:{}};}
+let state = freshState();
+let profile = {name:"",lic:"",sig:""};
+const it = ref => state.items[ref] || (state.items[ref]={st:"",entries:[]});
+
+/* ---------- storage (IndexedDB: handles many photos) ---------- */
+function db(){
+  if(db.p) return db.p;
+  db.p = new Promise((res,rej)=>{
+    const r = indexedDB.open("eiR1",1);
+    r.onupgradeneeded = ()=>r.result.createObjectStore("kv");
+    r.onsuccess = ()=>res(r.result);
+    r.onerror = ()=>rej(r.error);
+  });
+  return db.p;
+}
+async function kvGet(k){
+  try{
+    const d = await db();
+    return await new Promise((res,rej)=>{const q=d.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});
+  }catch(e){return null;}
+}
+async function kvSet(k,v){
+  try{
+    const d = await db();
+    return await new Promise((res,rej)=>{const t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=()=>res(true);t.onerror=()=>rej(t.error);});
+  }catch(e){return false;}
+}
+let saveT;
+function touch(){
+  $("#saved").textContent="saving…";
+  clearTimeout(saveT);
+  saveT=setTimeout(async()=>{ $("#saved").textContent = (await kvSet("draft",state)) ? "✓ saved" : "⚠ not saved"; },500);
+}
+
+/* ---------- photo compression ---------- */
+function compress(file,maxSide=1000,q=0.75){
+  return new Promise((resolve,reject)=>{
+    const fr=new FileReader();
+    fr.onerror=reject;
+    fr.onload=ev=>{
+      const img=new Image();
+      img.onerror=reject;
+      img.onload=()=>{
+        const sc=Math.min(1,maxSide/Math.max(img.width,img.height));
+        const c=document.createElement("canvas");
+        c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc);
+        c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+        resolve({data:c.toDataURL("image/jpeg",q),w:c.width,h:c.height});
+      };
+      img.src=ev.target.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+/* ---------- UI ---------- */
+function buildList(){
+  const box=$("#list"); box.innerHTML="";
+  DATA.forEach((s,si)=>{
+    const [num,...rest]=s.sec.split(" ");
+    const det=document.createElement("details");
+    det.className="sec"; det.open=(si===0);
+    det.innerHTML=`<summary><span class="sn">${num}</span>${esc(rest.join(" "))}<span class="cnt" id="cnt${si}"></span></summary>
+      <div class="secbtn"><button type="button" class="link" data-act="secok" data-si="${si}">Set unset items in this section to ✓</button></div>
+      <div class="items"></div>`;
+    const ib=det.querySelector(".items");
+    s.items.forEach(i=>{const d=document.createElement("div");d.id="it_"+i.ref.replace(/\./g,"_");fillItem(d,i);ib.appendChild(d);});
+    box.appendChild(det);
+  });
+  updateProgress();
+}
+function fillItem(div,i){
+  const d=it(i.ref);
+  div.className="item"+(d.st?" done":"")+(d.st==="✗"?" bad":"");
+  const btn=(v,c)=>`<button type="button" class="sb ${c} ${d.st===v?"on":""}" data-act="st" data-ref="${i.ref}" data-v="${v}">${v}</button>`;
+  div.innerHTML=`<div class="ih"><b>${i.ref}</b> ${esc(i.desc)}</div>
+    <div class="st">${btn("✓","ok")}${btn("✗","no")}${btn("NA","na")}
+      <button type="button" class="ab" data-act="photo" data-ref="${i.ref}" title="Add photo">📷</button>
+      <button type="button" class="ab" data-act="rem" data-ref="${i.ref}" title="Add remark only">✎</button></div>
+    ${d.entries.map((e,n)=>`<div class="ent">${e.data?`<img src="${e.data}"/>`:""}
+      <div class="er"><textarea placeholder="Remark" data-act="remtxt" data-ref="${i.ref}" data-n="${n}">${esc(e.remark)}</textarea>
+      <button type="button" class="x" data-act="del" data-ref="${i.ref}" data-n="${n}">✕</button></div></div>`).join("")}`;
+}
+function refresh(ref){const div=$("#it_"+ref.replace(/\./g,"_"));if(div)fillItem(div,REF[ref]);updateProgress();}
+function updateProgress(){
+  let tot=0,done=0;
+  DATA.forEach((s,si)=>{
+    const n=s.items.filter(i=>it(i.ref).st).length;
+    tot+=s.items.length;done+=n;
+    const c=$("#cnt"+si);if(c)c.textContent=n+"/"+s.items.length;
+  });
+  $("#prog").textContent=done+"/"+tot;
+}
+
+let pendingRef=null;
+$("#list").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-act]"); if(!b) return;
+  const act=b.dataset.act, ref=b.dataset.ref;
+  if(act==="st"){const d=it(ref);d.st=(d.st===b.dataset.v)?"":b.dataset.v;refresh(ref);touch();}
+  else if(act==="photo"){pendingRef=ref;$("#pick").value="";$("#pick").click();}
+  else if(act==="rem"){it(ref).entries.push({data:"",remark:""});refresh(ref);touch();
+    const t=document.querySelectorAll(`#it_${ref.replace(/\./g,"_")} textarea`);if(t.length)t[t.length-1].focus();}
+  else if(act==="del"){if(!(await ask("Delete this photo/remark?")))return;it(ref).entries.splice(+b.dataset.n,1);refresh(ref);touch();}
+  else if(act==="secok"){DATA[+b.dataset.si].items.forEach(i=>{const d=it(i.ref);if(!d.st){d.st="✓";refresh(i.ref);}});touch();}
+});
+$("#list").addEventListener("input",e=>{
+  const t=e.target;
+  if(t.dataset.act==="remtxt"){it(t.dataset.ref).entries[+t.dataset.n].remark=t.value;touch();}
+});
+$("#pick").addEventListener("change",async function(){
+  const ref=pendingRef; if(!ref||!this.files.length) return;
+  for(const f of this.files){
+    try{const c=await compress(f);it(ref).entries.push({data:c.data,w:c.w,h:c.h,remark:""});}
+    catch(err){say("Could not read one photo, please try again.");}
+  }
+  refresh(ref);touch();
+  const t=document.querySelectorAll(`#it_${ref.replace(/\./g,"_")} textarea`);if(t.length)t[t.length-1].focus();
+});
+
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.dataset.site){state.site[t.dataset.site]=t.value;touch();}
+  if(t.dataset.prof){profile[t.dataset.prof]=t.value;kvSet("profile",profile);}
+});
+function fillTop(){
+  document.querySelectorAll("[data-site]").forEach(el=>el.value=state.site[el.dataset.site]||"");
+  document.querySelectorAll("[data-prof]").forEach(el=>el.value=profile[el.dataset.prof]||"");
+}
+
+/* ---------- signature pad ---------- */
+const cv=$("#sig"),cx=cv.getContext("2d");let drawing=false,last=null;
+const pos=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height};};
+cv.addEventListener("pointerdown",e=>{drawing=true;last=pos(e);cv.setPointerCapture(e.pointerId);e.preventDefault();});
+cv.addEventListener("pointermove",e=>{
+  if(!drawing)return;const p=pos(e);
+  cx.lineWidth=3;cx.lineCap="round";cx.strokeStyle="#111";
+  cx.beginPath();cx.moveTo(last.x,last.y);cx.lineTo(p.x,p.y);cx.stroke();last=p;
+});
+const sigEnd=()=>{if(!drawing)return;drawing=false;profile.sig=cv.toDataURL("image/png");kvSet("profile",profile);};
+cv.addEventListener("pointerup",sigEnd);cv.addEventListener("pointercancel",sigEnd);
+$("#sigClear").onclick=()=>{cx.clearRect(0,0,cv.width,cv.height);profile.sig="";kvSet("profile",profile);};
+function drawSavedSig(){if(!profile.sig)return;const im=new Image();im.onload=()=>cx.drawImage(im,0,0,cv.width,cv.height);im.src=profile.sig;}
+
+/* ---------- buttons ---------- */
+$("#btnAllOk").onclick=async()=>{
+  const n=ALL.filter(r=>!it(r).st).length;
+  if(!n){await say("Every item already has a status.");return;}
+  if(!(await ask(n+" unset item(s) will be set to ✓ (acceptable). Continue?")))return;
+  ALL.forEach(r=>{const d=it(r);if(!d.st){d.st="✓";refresh(r);}});touch();
+};
+$("#btnNew").onclick=async()=>{
+  if(!(await ask("Start a NEW report? Current items and photos will be cleared (LEW name and signature are kept).")))return;
+  state=freshState();kvSet("draft",state);fillTop();buildList();window.scrollTo(0,0);
+};
+$("#btnPdf").onclick=exportPdf;
+
+/* ---------- PDF (drawn directly, matches the official layout) ---------- */
+const clean=s=>String(s??"").replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/[\u2013\u2014]/g,"-").replace(/\u2026/g,"...").replace(/[^\x0A\x20-\x7E\u00A0-\u00FF]/g,"?");
+const NONLATIN=/[^\x00-\xFF\u2018\u2019\u201C\u201D\u2013\u2014\u2026]/;
+
+async function exportPdf(){
+  if(!window.jspdf){await say("PDF library did not load (needs internet). Reload the page and try again.");return;}
+  const unset=ALL.filter(r=>!it(r).st);
+  if(unset.length && !(await ask(unset.length+" item(s) have no status: "+unset.slice(0,10).join(", ")+(unset.length>10?"…":"")+"\nAll boxes must be filled. Generate PDF anyway?")))return;
+  const texts=[state.site.name,state.site.addr,state.site.lic,profile.name,profile.lic];
+  ALL.forEach(r=>it(r).entries.forEach(e=>texts.push(e.remark)));
+  if(texts.some(t=>NONLATIN.test(t||"")) && !(await ask("Some text contains non-English characters (e.g. Chinese). The PDF font only supports English, so they will show as '?'. Continue?")))return;
+  try{ buildPdf(); }catch(err){ say("PDF error: "+err.message); console.error(err); }
+}
+
+let dlCap=null;
+(async()=>{try{if(window.claude&&claude.use)dlCap=await claude.use("downloads");}catch(e){}})();
+async function savePdf(doc,fname){
+  if(dlCap){
+    try{await dlCap.save({filename:fname,data:doc.output("blob")});}
+    catch(e){if(!e||e.code!=="declined")say("Could not save the PDF ("+((e&&e.code)||"error")+"). Try opening this page in a browser on a computer.");}
+  }else{ doc.save(fname); }
+}
+
+function buildPdf(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:"mm",format:"a4"});
+  const L=13,R=200.5,W=R-L;
+  let y=14;
+  const site=state.site;
+  const font=(st,sz)=>{doc.setFont("times",st);doc.setFontSize(sz);};
+  const T=(t,x,yy,o)=>doc.text(clean(t),x,yy,o);
+  const ensure=h=>{if(y+h>284){doc.addPage();y=14;}};
+  const uline=(x1,x2,yy)=>{doc.setDrawColor(150);doc.setLineWidth(0.25);doc.setLineDashPattern([],0);doc.line(x1,yy,x2,yy);};
+  const field=(label,val,x,xv,xe)=>{T(label,x,y);T(val,xv+1,y-0.4);uline(xv,xe,y+1.2);};
+  const para=s=>{const ls=doc.splitTextToSize(s,W);doc.text(ls,L,y);y+=ls.length*3.9+1.6;};
+
+  /* title + intro */
+  font("bold",11);
+  doc.text("REPORT BY LICENSED ELECTRICAL WORKER (LEW) FOR",105,y,{align:"center"});y+=5;
+  doc.text("CONDOMINIUMS AND MULTI-TENANTED BUILDINGS",105,y,{align:"center"});y+=8;
+  font("bold",15);doc.text("EI(R1) REPORT",105,y,{align:"center"});y+=7;
+  font("normal",9);
+  para("This form has 7 sections and shall be filled up during site inspection in the presence of the consumer's representative. It may take at least 40 minutes to fill up the form, depending on the scale of the consumer's electrical installation. You will require your license number and the particulars of the electrical installation license to complete this report.");
+  font("bold",9);doc.text("Note:",L,y);y+=4;font("normal",9);
+  para("The original copy of this report shall be submitted to the Energy Market Authority of Singapore, in accordance with the conditions of the installation license issued to the premises.");
+  para("All boxes must be filled. Tick ( / ), ( x ) or ( NA ) as appropriate to denote acceptable, unacceptable and not applicable conditions respectively. The \"Remarks\" column is provided for additional details including rectification action for unacceptable conditions. Where applicable, the LEW may supplement this Report with additional information.");
+
+  /* particulars */
+  y+=1;font("bold",10.5);doc.text("PARTICULARS OF INSTALLATION",L,y);y+=6.5;font("normal",10);
+  field("Name of Installation:",site.name,L,52,R);y+=7;
+  T("Address of Installation:",L,y);
+  const al=doc.splitTextToSize(clean(site.addr||""),R-53).slice(0,3);
+  (al.length?al:[""]).forEach((ln,k)=>{doc.text(ln,53,y+k*5.5-0.4);uline(52,R,y+k*5.5+1.2);});
+  y+=Math.max(al.length,1)*5.5+1.5;
+  field("Installation License No:",site.lic,L,52,100);
+  field("Date of Inspection:",site.date,106,137,R);y+=9;
+
+  /* checklist */
+  DATA.forEach(s=>{
+    const [num,...rest]=s.sec.split(" ");
+    ensure(2+6.2+5.2*2);
+    y+=2;font("bold",10.5);doc.text(num,L,y+4);doc.text(rest.join(" "),L+12,y+4);y+=6.2;
+    font("normal",10);
+    let prevG="";
+    s.items.forEach(i=>{
+      ensure(5.2);
+      const p=i.ref.split("."),d=it(i.ref);
+      font("normal",10);doc.setTextColor(0);
+      if(p.length===3){
+        const g=p[0]+"."+p[1];
+        if(g!==prevG)doc.text(g,L,y+3.9);
+        prevG=g;
+        doc.text(i.ref,L+12,y+3.9);T(i.desc,L+23.5,y+3.9);
+      }else{
+        prevG="";doc.text(i.ref,L,y+3.9);T(i.desc,L+12,y+3.9);
+      }
+      /* status box */
+      const bx=147.5,by=y+0.5,bw=12,bh=4.4;
+      doc.setDrawColor(0);doc.setLineDashPattern([],0);doc.setLineWidth(0.3);doc.rect(bx,by,bw,bh);
+      doc.setLineWidth(0.4);
+      if(d.st==="✓"){doc.line(bx+4.6,by+2.4,bx+5.8,by+3.6);doc.line(bx+5.8,by+3.6,bx+7.8,by+0.9);}
+      else if(d.st==="✗"){doc.line(bx+4.9,by+1,bx+7.1,by+3.4);doc.line(bx+7.1,by+1,bx+4.9,by+3.4);}
+      else if(d.st==="NA"){font("normal",8);doc.text("NA",bx+bw/2,by+3.2,{align:"center"});font("normal",10);}
+      /* remarks column */
+      doc.setDrawColor(150);doc.setLineWidth(0.25);doc.setLineDashPattern([1.2,0.8],0);doc.line(165.5,y+5,R,y+5);doc.setLineDashPattern([],0);
+      if(d.entries.length){font("normal",9.5);doc.text("See Attached",165.5,y+3.9);font("normal",10);}
+      y+=5.2;
+    });
+  });
+
+  /* declaration */
+  ensure(100);
+  y+=7;font("bold",10.5);doc.text("7",L,y);doc.text("DECLARATION BY LEW",L+12,y);y+=6;
+  font("bold",10);
+  const dl=doc.splitTextToSize(clean("I have carried out inspection on "+site.date+" (date of inspection), witnessed by the representative of the license and hereby I declare that the electrical installation is fit and safe for operation."),R-25);
+  doc.text(dl,25,y);y+=dl.length*4.6+8;
+  font("normal",10);
+  field("Name of LEW:",profile.name,L,39,97);
+  field("License No:",profile.lic,102,123,R);y+=12;
+  T("Signature:",L,y);
+  if(profile.sig){try{doc.addImage(profile.sig,"PNG",39,y-12,45,13.5);}catch(e){}}
+  uline(39,R,y+1.2);y+=15;
+  font("bold",10);doc.text("THE INSPECTION WAS WITNESSED BY REPRESENTATIVE OF THE LICENSE",L,y);y+=9;
+  font("normal",10);
+  ["Name of Representative:","Designation:","Signature:"].forEach(l=>{doc.text(l,L,y);uline(53,R,y+1.2);y+=9.5;});
+
+  /* site photos: 2 columns */
+  const blocks=[];
+  DATA.forEach(s=>s.items.forEach(i=>it(i.ref).entries.forEach(e=>blocks.push({i,e}))));
+  if(blocks.length){
+    doc.addPage();y=12;font("normal",10);doc.text("Site Photos:",L,y);y=20;
+    const COLX=[13.2,110.4],CW=90.2;
+    const blockH=b=>{font("normal",9.5);const n=Math.max(1,Math.min(doc.splitTextToSize(clean(b.e.remark||" "),CW).length,8));return 6+(b.e.data?93:0)+6+n*4.2+4;};
+    for(let k=0;k<blocks.length;k+=2){
+      const pair=blocks.slice(k,k+2);
+      const h=Math.max(...pair.map(blockH));
+      if(y+h>288){doc.addPage();y=14;}
+      pair.forEach((b,c)=>{
+        const x=COLX[c];let yy=y;
+        font("bold",10.5);
+        doc.text(doc.splitTextToSize(clean(b.i.ref+" "+b.i.desc),CW)[0],x,yy+4);yy+=6;
+        if(b.e.data){
+          doc.setDrawColor(60);doc.setLineWidth(0.3);doc.setLineDashPattern([],0);doc.rect(x,yy,CW,CW);
+          const sc=Math.min(CW/b.e.w,CW/b.e.h),iw=b.e.w*sc,ih=b.e.h*sc;
+          doc.addImage(b.e.data,"JPEG",x+(CW-iw)/2,yy+(CW-ih)/2,iw,ih);
+          yy+=93;
+        }
+        font("bold",10);doc.text("Remark:",x,yy+3.5);yy+=6;
+        font("normal",9.5);
+        doc.text(doc.splitTextToSize(clean(b.e.remark||""),CW).slice(0,8),x,yy+3);
+      });
+      y+=h+4;
+    }
+  }
+
+  const fname="EI_R1_"+((site.name||"report").replace(/[^\w\-]+/g,"_"))+"_"+((site.date||"").replace(/\//g,"-"))+".pdf";
+  savePdf(doc,fname);
+}
+
+/* ---------- start ---------- */
+(async()=>{
+  const d=await kvGet("draft"); if(d&&d.items&&d.site) state=d;
+  const p=await kvGet("profile"); if(p) profile=Object.assign(profile,p);
+  fillTop();buildList();drawSavedSig();
+  $("#saved").textContent=d?"✓ restored":"new";
+})();
+</script>
+</body>
+</html>
 
