@@ -336,9 +336,9 @@ function buildPdf(){
 
   /* title + intro */
   font("bold",11);
-  doc.text("REPORT BY LICENSED ELECTRICAL WORKER (LEW) FOR",105,y,{align:"center"});y+=5;
-  doc.text("CONDOMINIUMS AND MULTI-TENANTED BUILDINGS",105,y,{align:"center"});y+=8;
-  font("bold",15);doc.text("EI(R1) REPORT",105,y,{align:"center"});y+=7;
+  doc.text("REPORT BY LICENSED ELECTRICAL WORKER (LEW) FOR",105,y,{align:"left"});y+=5;
+  doc.text("CONDOMINIUMS AND MULTI-TENANTED BUILDINGS",105,y,{align:"left"});y+=8;
+  font("bold",15);doc.text("EI(R1) REPORT",105,y,{align:"right"});y+=7;
   font("normal",9);
   para("This form has 7 sections and shall be filled up during site inspection in the presence of the consumer's representative. It may take at least 40 minutes to fill up the form, depending on the scale of the consumer's electrical installation. You will require your license number and the particulars of the electrical installation license to complete this report.");
   font("bold",9);doc.text("Note:",L,y);y+=4;font("normal",9);
