@@ -1,6 +1,6 @@
 # EI(R1) Report
 
-0/0 done · —
+
 
 ## PARTICULARS OF INSTALLATION
 
