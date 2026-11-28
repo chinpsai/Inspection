@@ -163,7 +163,7 @@ Static hosting via **GitHub Pages**:
 2. Source: `Deploy from a branch` → branch `main` → folder `/ (root)`
 3. Save, wait 1–3 minutes
 4. Site live at `https://<username>.github.io/<repo-name>/`
-5. `https://chinpsai.github.io/Inspection/`
+5. 'https://chinpsai.github.io/Inspection/'
 
 > Remember: if the repository is renamed, the Pages URL changes.
 
