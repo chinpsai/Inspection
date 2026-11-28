@@ -336,11 +336,16 @@ function buildPdf(){
 
   /* title + intro */
   font("bold",11);
-  doc.text("REPORT BY LICENSED ELECTRICAL WORKER (LEW) FOR",105,y,{align:"center"});y+=5;
-  doc.text("CONDOMINIUMS AND MULTI-TENANTED BUILDINGS",105,y,{align:"center"});y+=8;
-  font("bold",15);doc.text("EI(R1) REPORT",105,y,{align:"center"});y+=7;
+  const t1="REPORT BY LICENSED ELECTRICAL WORKER (LEW) FOR",t2="CONDOMINIUMS AND MULTI-TENANTED BUILDINGS";
+  doc.setDrawColor(0);doc.setLineWidth(0.3);doc.setLineDashPattern([],0);
+  doc.text(t1,L,y);doc.line(L,y+1,L+doc.getTextWidth(t1),y+1);
+  doc.text("EI(R1) REPORT",R,y,{align:"right"});y+=5.5;
+  doc.text(t2,L,y);doc.line(L,y+1,L+doc.getTextWidth(t2),y+1);y+=9;
   font("normal",9);
-  para("This form has 7 sections and shall be filled up during site inspection in the presence of the consumer's representative. It may take at least 40 minutes to fill up the form, depending on the scale of the consumer's electrical installation. You will require your license number and the particulars of the electrical installation license to complete this report.");
+  const intro=doc.splitTextToSize("This form has 7 sections and shall be filled up during site inspection in the presence of the consumer's representative. It may take at least 40 minutes to fill up the form, depending on the scale of the consumer's electrical installation. You will require your license number and the particulars of the electrical installation license to complete this report.",W-6);
+  const ibh=intro.length*3.9+2.4;
+  doc.setDrawColor(0);doc.setLineWidth(0.3);doc.rect(L,y-3,W,ibh);
+  doc.text(intro,L+3,y+0.8);y+=ibh+3;
   font("bold",9);doc.text("Note:",L,y);y+=4;font("normal",9);
   para("The original copy of this report shall be submitted to the Energy Market Authority of Singapore, in accordance with the conditions of the installation license issued to the premises.");
   para("All boxes must be filled. Tick ( / ), ( x ) or ( NA ) as appropriate to denote acceptable, unacceptable and not applicable conditions respectively. The \"Remarks\" column is provided for additional details including rectification action for unacceptable conditions. Where applicable, the LEW may supplement this Report with additional information.");
@@ -447,4 +452,3 @@ function buildPdf(){
 </script>
 </body>
 </html>
-
